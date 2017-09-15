@@ -1,8 +1,10 @@
 (ns bowly.core
   (:gen-class))
 
+(load "config")
+
 (require '[irclj.core :as irc])
-(require '[clojure.string  :as string])
+(require '[clojure.string :as string])
 
 (defn echo [s] s)
 
@@ -20,7 +22,7 @@
    (first (string/split s #"\s")))
 
 (defn privmsg [irc msg & s]
-  "General reply to what's going on. Execute commands."
+  "Receive messages. Execute commands."
   (let [command (parse-command (:text msg))]
      (irc/reply irc
                msg
@@ -30,8 +32,8 @@
 (defn -main
   "Connect and start listening"
   [& args]
-  ((def connection (irc/connect "irc.freenode.net" 6667 "Bowly"
+  ((def connection (irc/connect (:server config) (:port config) (:nick config)
                                 :callbacks {
                                             :privmsg privmsg
                                             }))
-   (irc/join connection "#hahasame")))
+   (irc/join connection (:channel config))))
